@@ -1,5 +1,3 @@
-
-
 // Audio context initialization
 let mediaRecorder, audioChunks, audioBlob, stream, audioRecorded;
 const ctx = new AudioContext();
@@ -8,7 +6,15 @@ let lettersOfWordAreCorrect = [];
 
 // UI-related variables
 const page_title = "AI Pronunciation Trainer";
-const accuracy_colors = ["green", "orange", "red"];
+
+const getThemeColor = (cssVar) =>
+    getComputedStyle(document.documentElement).getPropertyValue(cssVar).trim();
+
+const accuracy_colors = [
+    getThemeColor('--color-good'),
+    getThemeColor('--color-okay'),
+    getThemeColor('--color-bad')
+];
 let badScoreThreshold = 30;
 let mediumScoreThreshold = 70;
 let currentSample = 0;
@@ -51,7 +57,7 @@ const unblockUI = () => {
     document.getElementById("recordAudio").classList.remove('disabled');
     document.getElementById("playSampleAudio").classList.remove('disabled');
     document.getElementById("buttonNext").onclick = () => getNextSample();
-    document.getElementById("nextButtonDiv").classList.remove('disabled');
+    document.getElementById("buttonNext").classList.remove('disabled');
     document.getElementById("original_script").classList.remove('disabled');
     document.getElementById("buttonNext").style["background-color"] = '#58636d';
 
@@ -74,17 +80,17 @@ const blockUI = () => {
 
 };
 
-const UIError = () => {
+const UIError = (error) => {
     blockUI();
     document.getElementById("buttonNext").onclick = () => getNextSample(); //If error, user can only try to get a new sample
     document.getElementById("buttonNext").style["background-color"] = '#58636d';
 
     document.getElementById("recorded_ipa_script").innerHTML = "";
-    document.getElementById("single_word_ipa_pair").innerHTML = "Error";
-    document.getElementById("ipa_script").innerHTML = "Error"
+    document.getElementById("ipa_script").innerHTML = ""
 
     document.getElementById("main_title").innerHTML = 'Server Error';
     document.getElementById("original_script").innerHTML = 'Server error. Either the daily quota of the server is over or there was some internal error. You can try to generate a new sample in a few seconds. If the error persist, try comming back tomorrow or download the local version from Github :)';
+    throw error;
 };
 
 const UINotSupported = () => {
@@ -141,7 +147,7 @@ const getNextSample = async () => {
         await initializeServer();
 
     if (!serverWorking) {
-        UIError();
+        UIError(Error("server not working"));
         return;
     }
 
@@ -154,22 +160,14 @@ const getNextSample = async () => {
 
     document.getElementById("main_title").innerHTML = "Processing new sample...";
 
-
-    if (document.getElementById('lengthCat1').checked) {
-        sample_difficult = 0;
-        scoreMultiplier = 1.3;
-    }
-    else if (document.getElementById('lengthCat2').checked) {
-        sample_difficult = 1;
-        scoreMultiplier = 1;
-    }
-    else if (document.getElementById('lengthCat3').checked) {
-        sample_difficult = 2;
-        scoreMultiplier = 1.3;
-    }
-    else if (document.getElementById('lengthCat4').checked) {
-        sample_difficult = 3;
-        scoreMultiplier = 1.6;
+    const difficultyValue = document.getElementById('difficultySelect').value;
+    sample_difficult = parseInt(difficultyValue);
+    switch (sample_difficult) {
+        case 0: scoreMultiplier = 1.3; break; // Random
+        case 1: scoreMultiplier = 1; break;   // Easy
+        case 2: scoreMultiplier = 1.3; break; // Medium
+        case 3: scoreMultiplier = 1.6; break; // Hard
+        default: scoreMultiplier = 1;
     }
 
     try {
@@ -195,8 +193,9 @@ const getNextSample = async () => {
 
                 document.getElementById("recorded_ipa_script").innerHTML = ""
                 document.getElementById("pronunciation_accuracy").innerHTML = "";
-                document.getElementById("single_word_ipa_pair").innerHTML = "Reference | Spoken"
-                document.getElementById("section_accuracy").innerHTML = "| Score: " + currentScore.toString() + " - (" + currentSample.toString() + ")";
+                document.getElementById("reference_word").innerHTML ="";
+                document.getElementById("spoken_word").innerHTML = "";
+                document.getElementById("section_accuracy").innerHTML = "Score: " + currentScore.toString() + " - (" + currentSample.toString() + ")";
                 currentSample += 1;
 
                 document.getElementById("main_title").innerHTML = page_title;
@@ -209,9 +208,9 @@ const getNextSample = async () => {
 
             })
     }
-    catch
+    catch (error)
     {
-        UIError();
+        UIError(error);
     }
 
 
@@ -230,8 +229,9 @@ const updateRecordingState = async () => {
 
 const generateWordModal = (word_idx) => {
 
-    document.getElementById("single_word_ipa_pair").innerHTML = wrapWordForPlayingLink(real_transcripts_ipa[word_idx], word_idx, false, "black")
-        + ' | ' + wrapWordForPlayingLink(matched_transcripts_ipa[word_idx], word_idx, true, accuracy_colors[parseInt(wordCategories[word_idx])])
+    document.getElementById("reference_word").innerHTML = wrapWordForPlayingLink(real_transcripts_ipa[word_idx], word_idx, false,  getThemeColor('--text'));
+
+    document.getElementById("spoken_word").innerHTML = wrapWordForPlayingLink(matched_transcripts_ipa[word_idx], word_idx, true, accuracy_colors[parseInt(wordCategories[word_idx])]);
 }
 
 const recordSample = async () => {
@@ -253,15 +253,11 @@ const changeLanguage = (language, generateNewSample = false) => {
     let languageIdentifier, languageName;
     switch (language) {
         case 'de':
-
-            document.getElementById("languageBox").innerHTML = "German";
             languageIdentifier = 'de';
             languageName = 'Anna';
             break;
 
         case 'en':
-
-            document.getElementById("languageBox").innerHTML = "English";
             languageIdentifier = 'en';
             languageName = 'Daniel';
             break;
@@ -397,8 +393,8 @@ const startMediaDevice = () => {
 
                     });
             }
-            catch {
-                UIError();
+            catch (error){
+                UIError(error);
             }
         };
 
@@ -539,9 +535,9 @@ const blobToBase64 = blob => new Promise((resolve, reject) => {
 
 const wrapWordForPlayingLink = (word, word_idx, isFromRecording, word_accuracy_color) => {
     if (isFromRecording)
-        return '<a style = " white-space:nowrap; color:' + word_accuracy_color + '; " href="javascript:playRecordedWord(' + word_idx.toString() + ')"  >' + word + '</a> '
+        return '<span class="ipa-word-right" style="color:' + word_accuracy_color + ';" onclick="playRecordedWord(' + word_idx + ')">' + word + '</span>';
     else
-        return '<a style = " white-space:nowrap; color:' + word_accuracy_color + '; " href="javascript:playCurrentWord(' + word_idx.toString() + ')" >' + word + '</a> '
+        return '<span class="ipa-word-left" style="color:' + word_accuracy_color + ';" onclick="playCurrentWord(' + word_idx + ')">' + word + '</span>';
 }
 
 const wrapWordForIndividualPlayback = (word, word_idx) => {

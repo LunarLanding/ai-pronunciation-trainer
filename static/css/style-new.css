@@ -1,471 +1,499 @@
+/* ############# Color Scheme Variables ############## */
+:root {
+    --background: #f2f2f2;
+    --container-bg: #fff;
+    --text: #000;
+    --primary: #3498db;
+    --secondary: #58636d;
+    --mic-bg: #2ecc40;
+    --button-text: #fff;
+    --input-bg: #fff;
+    --input-text: #000;
+    --input-border: #bbb;
+    --hover-bg: #f0f0f0;
+    --shadow: 0 0 1.25rem 0.5rem #d0d0d0;
+    --shadow-btn: 0 2px 8px rgba(52, 152, 219, 0.2);
+    --shadow-mic: 0 2px 8px rgba(44, 204, 64, 0.2);
+    --disabled-bg: #afafaf;
+    --color-good: #2ecc40;
+    --color-okay: #ff9800;
+    --color-bad: #e74c3c;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: #181a1b;
+        --container-bg: #23272a;
+        --text: #f2f2f2;
+        --primary: #2980b9;
+        --secondary: #7f8c8d;
+        --mic-bg: #27ae60;
+        --button-text: #fff;
+        --input-bg: #23272a;
+        --input-text: #f2f2f2;
+        --input-border: #444;
+        --hover-bg: #222;
+        --shadow: 0 0 1.25rem 0.5rem #111;
+        --shadow-btn: 0 2px 8px rgba(41, 128, 185, 0.2);
+        --shadow-mic: 0 2px 8px rgba(39, 174, 96, 0.2);
+        --disabled-bg: #444;
+        --color-good: #27ae60;
+        --color-okay: #ffb74d;
+        --color-bad: #ff7675;
+    }
+}
+
+/* ############# Base Elements ############## */
 body {
-	background: #f2f2f2;
-}
-
-
-.expanded {
-	margin: auto;
-	align-content: center;
-}
-
-p {
-	overflow: auto;
+    background: var(--background);
+    color: var(--text);
+    font-size: 1rem;
 }
 
 h1 {
-	margin-left: 2%;
+    margin-left: 2%;
+    color: var(--text);
 }
 
-a.disabled {
-	pointer-events: none;
-	color: #ccc;
-	background-color: #ccc;
+a .material-icons,
+a.material-icons {
+    text-decoration: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+    color: var(--text);
+}
+p {
+    overflow: auto;
+    color: var(--text);
 }
 
-
-.horizontal-flexbox {
-	height: 100%;
-	width: 100%;
-	display: flex;
+.margin-bottom-200 {
+    margin-bottom: 6.25rem;
 }
 
-/* ############## Next button ##### */
-.button-next {
-	border-radius: 4px;
-	display: block;
-	border: none;
-	color: #FFFFFF;
-	text-align: left;
-	font-size: 3em;
-	box-sizing: border-box;
-	position: absolute;
-	top: 0;
-	left: 0%;
-	right: 2%;
-	bottom: 2%;
-	background-color: #58636d;
-	width: 10em;
-
-	transition: all 0.5s;
-	cursor: pointer;
+.expanded {
+    margin: auto;
+    align-content: center;
 }
 
-.button-next:hover {
-	background-color: #6383a1 !important;
-}
-
-.button-next span {
-	cursor: pointer;
-	display: inline-block;
-	position: relative;
-	transition: 0.5s;
-}
-
-/*
-.button-next span:after {
-	content: '\00bb';
-	position: absolute;
-	opacity: 0;
-	top: 0;
-	right: -20px;
-	transition: 0.5s;
-
-}*/
-
-.button-next:hover span {
-	padding-right: 25px;
-}
-
-.button-next:hover span:after {
-	opacity: 1;
-	right: 0;
-}
-
-
-
-/* ############# Texts ##############  */
-
+/* ############# Main Texts ############## */
 .main-text {
-	font-size: 2.5em;
-	max-width: 87%;
+    font-size: 2.5em;
+    max-width: 87%;
+    color: var(--text);
 }
 
 .ipa-text {
-	font-size: 1.8em;
-	max-width: 87%;
+    font-size: 1.8em;
+    max-width: 87%;
+    color: var(--text);
 }
 
 .ipa-text-small {
-	font-size: 1.5em;
+    font-size: 1.5em;
+    color: var(--text);
 }
 
 .accuracy-text {
-	/*font-family: "Dank Mono", ui-monospace, monospace;*/
-	background: linear-gradient(to right,
-			rgb(54, 56, 80),
-			rgb(21, 60, 87));
-	background-clip: text;
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
-	text-align: center;
-	font-size: 2em;
-	margin-left: 2%;
-	left: 0%;
+    text-align: center;
+    font-size: 2em;
+    margin-left: 2%;
+    left: 0%;
+    color: var(--text);
 }
 
-.main-text-div {
-	overflow-y: auto;
-	position: absolute;
-	left: 10%;
-	right: 10%;
-	top: 2%;
-	bottom: 2%;
+/* ############# Header Row & Home Icon ############## */
+.header-row {
+    display: flex;
+    flex-direction: row;
 }
 
-/* ############# Card Container ##############  */
-.container {
-	display: block;
-	position: absolute;
-	left: 2%;
-	top: 18%;
-	transform: translate(-0%, -0%);
-	height: 59%;
-	width: 96%;
-	max-width: 96%;
-	background: #ffff;
-	overflow: hidden;
-	border-radius: 20px;
-	box-shadow: 0 0 20px 8px #d0d0d0;
-}
-
-.container-small {
-	position: fixed;
-	left: 68%;
-	top: 79%;
-	transform: translate(-0%, -0%);
-	height: 7%;
-	width: 30%;
-	background: #ffff;
-	overflow: hidden;
-	border-radius: 20px;
-	box-shadow: 0 0 20px 8px #d0d0d0;
-}
-
-/* ############# Icon Button ##############  */
-
-.round-button {
-	box-sizing: border-box;
-	display: block;
-	width: 3em;
-	/* 80px */
-	height: 3em;
-	left: 0%;
-	padding-top: 14px;
-	padding-left: 0px;
-	line-height: 0px;
-	border: 6px solid #fff;
-	border-radius: 50%;
-	color: #f5f5f5;
-	text-align: center;
-	text-decoration: none;
-	background-color: #467387;
-	font-size: 20px;
-	font-weight: bold;
-	transition: all 0.3s ease;
-}
-
-.round-button:hover {
-	background-color: rgba(0, 0, 0, 0.8);
-	box-shadow: 0px 0px 10px #61a4d4;
-	text-shadow: 0px 0px 10px #61a4d4;
-}
-
-.icon-text {
-	font-size: 1em !important;
-	text-align: center;
-}
-
-.round-button-mic {
-	box-sizing: border-box;
-	display: block;
-	width: 4.5em;
-	/* 80px */
-	height: 4.5em;
-	padding-top: 14px;
-	padding-left: -2.25em;
-	line-height: 0px;
-	border: 6px solid #fff;
-	border-radius: 50%;
-	color: #f5f5f5;
-	text-align: center;
-	text-decoration: none;
-	background-color: #49d67d;
-	/*#467387;*/
-	font-size: 20px;
-	font-weight: bold;
-	transition: all 0.3s ease;
-}
-
-.round-button-mic:hover {
-	background-color: #477c5b;
-	/*rgba(0,0,0,0.8);*/
-	box-shadow: 0px 0px 10px #61a4d4;
-	text-shadow: 0px 0px 10px #61a4d4;
-}
-
-.icon-text-mic {
-	font-size: 2.5em !important;
+.home-icon-container {
+    display: inline-block;
+    margin-left: 1.5em;
 }
 
 .icon-text-home {
-	font-size: 3.5em !important;
+    text-align: right;
+    cursor: pointer;
+    color: var(--text);
 }
 
-.mic-button-div {
-	position: fixed;
-	left: 50%;
-	top: 80%
+/* ############# Language/Score Bar/ Difficulty ############## */
+.language-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-between;
+    margin-left: 1.5em;
+    margin-right: 1.5em;
 }
 
-/*############### Drop-down ############# */
-.dropbtn {
-	background-color: #ffffff;
-	color: rgb(50, 71, 165);
-	padding: 0px;
-	font-size: 16px;
-	border: none;
+.language-bar .settings-group {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+    align-items: center;
 }
 
-.dropdown {
-	position: relative;
-	display: inline-block;
+.language-bar .scores-group {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+    align-items: center;
+    margin-left: auto;
 }
 
-.dropdown-content {
-	display: none;
-	position: absolute;
-	background-color: #ffffff;
-	min-width: 160px;
-	box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-	z-index: 1;
+.language-group,
+.difficulty-picker {
+    flex: 0 0 auto;
 }
 
-.dropdown-content a {
-	color: black;
-	padding: 12px 16px;
-	text-decoration: none;
-	display: block;
+.language-group {
+    display: flex;
+    align-items: stretch;
+    flex: 1;
+    min-width: 0;
 }
 
-.dropdown-content a:hover {
-	background-color: #ddd;
+.language-text {
+    font-size: 1em;
+    text-align: left;
+    margin: 0;
+    color: var(--text);
 }
 
-.dropdown:hover .dropdown-content {
-	display: block;
+.score-text {
+    text-align: left;
+    color: var(--text);
+    font-size: 1.25em;
+    margin: 0;
 }
 
-.dropdown:hover .dropbtn {
-	background-color: #3e8e41;
+.difficulty-picker {
+    display: flex;
+    align-items: stretch;
+    margin: 0;
+    flex-shrink: 0;
+    padding: 0;
 }
 
-/* ############# Arrow ############## position: relative;  position: absolute;*/
+.language-dropbtn,
+#languageBox,
+#difficultySelect {
+    background: var(--input-bg) !important;
+    color: var(--input-text) !important;
+    border: 1px solid var(--input-border) !important;
+    box-shadow: none !important;
+    outline: none !important;
+    font-size: 1em;
+    border-radius: 0.25em;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+/* ############# Main Container ############## */
+.container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: stretch;
+    position: relative;
+    margin: 2vw auto 0 auto;
+    width: 96vw;
+    max-width: unset;
+    min-width: 20em;
+    height: auto;
+    min-height: 18.75rem;
+    background: var(--container-bg);
+    color: var(--text);
+    overflow: hidden;
+    border-radius: 1.25rem;
+    box-shadow: var(--shadow);
+    padding: 2vw 3vw;
+    gap: 2vw;
+}
+
+.container-small {
+    position: relative;
+    margin: 2vw auto 0 auto;
+    width: 90vw;
+    max-width: 37.5rem;
+    min-width: 0;
+    height: auto;
+    background: var(--container-bg);
+    color: var(--text);
+    overflow: hidden;
+    border-radius: 1.25rem;
+    box-shadow: var(--shadow);
+    padding: 1vw 2vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-small .ipa-text-small {
+    text-align: center;
+    vertical-align: middle;
+    color: var(--text);
+}
+
+/* ############# Play Area ############## */
+#play-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1em;
+    min-width: 6em;
+    max-width: 8em;
+    flex: 0 0 8em;
+}
+
+/* ############# Pronunciation Accuracy ############## */
+#pronunciation_accuracy {
+    text-align: center;
+    color: var(--text);
+}
+
+/* ############# Audio Buttons (Play/Record) ############## */
+
+.round-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 3.5em;
+    height: 3.5em;
+    border-radius: 50%;
+    background: var(--primary);
+    color: var(--button-text);
+    font-size: 2em;
+    box-shadow: var(--shadow-btn);
+    border: none;
+    transition: background 0.2s;
+    cursor: pointer;
+    margin-bottom: 0.5em;
+    text-align: center;
+}
+.round-button i.material-icons {
+    font-size: inherit;
+}
+.round-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--disabled-bg);
+}
+
+.round-button-mic {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 3.5em;
+    height: 3.5em;
+    border-radius: 50%;
+    background: var(--mic-bg);
+    color: var(--button-text);
+    text-align: center;
+    font-size: 2em;
+    box-shadow: var(--shadow-mic);
+    border: none;
+    transition: background 0.2s;
+    cursor: pointer;
+}
+.round-button-mic i.material-icons {
+    font-size: inherit;
+}
+.round-button-mic.disabled {
+    opacity: 0.5;
+    background: var(--disabled-bg);
+    cursor: not-allowed;
+}
+
+/* ############# Main Text Area ############## */
+.main-text-div {
+    overflow-y: auto;
+    flex: 1 1 0;
+    min-width: 5em;
+    position: static;
+    left: unset;
+    right: unset;
+    top: unset;
+    bottom: unset;
+    padding: 0 1em;
+    color: var(--text);
+}
+
+/* ############# Next Button ############## */
+.button-next {
+    border-radius: 0.25em;
+    display: block;
+    border: none;
+    color: var(--button-text);
+    text-align: left;
+    font-size: 3em;
+    box-sizing: border-box;
+    background-color: var(--secondary);
+    width: 100%;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 0;
+    position: static;
+    left: unset;
+    right: unset;
+    top: unset;
+    bottom: unset;
+}
+
+.button-next:hover {
+    background-color: var(--primary) !important;
+}
+
+.button-next span {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: 0.5s;
+}
+
+.button-next:hover span {
+    padding-right: 1.56em;
+}
+
+.button-next:hover span:after {
+    opacity: 1;
+    right: 0;
+}
+
+/* ############# Audio Controls ############## */
+.audio-controls {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 2em;
+    margin-bottom: 1em;
+    width: 100%;
+}
+
+/* ############# Main Content Wrapper ############## */
+.main-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    justify-content: space-between;
+    align-items: stretch;
+    width: 100vw;
+    max-width: 100vw;
+    box-sizing: border-box;
+    background: var(--background);
+    color: var(--text);
+}
+
+.top-section {
+    /* Stays at the top, no extra styling needed unless you want spacing */
+}
+
+.bottom-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5em;
+    width: 100%;
+    align-items: stretch;
+    margin-bottom: 1em;
+}
+
+@media (max-width: 600px) {
+    .main-content-wrapper {
+        padding-bottom: env(safe-area-inset-bottom, 1em);
+    }
+    .bottom-section {
+        gap: 1em;
+    }
+}
+
+/* ############# Arrow (Load More) ############## */
 .load-more {
-	position: fixed;
-	cursor: pointer;
-	width: 100px;
-	height: 100px;
-	margin: -0px 0 0 -0px;
-	min-width: 10px;
-	min-height: 10px;
-
-	left: 90%;
-	top: 45%;
-	border-width: 2px;
-	border-style: solid;
-	border-color: transparent;
-	border-bottom-color: #000;
-	border-right-color: #000;
-	border-radius: 0 0 5px 0;
-
-	transform: translate(-0%, -0%) rotate(-45deg);
+    position: fixed;
+    cursor: pointer;
+    width: 6.25em;
+    height: 6.25em;
+    margin: 0;
+    min-width: 0.625em;
+    min-height: 0.625em;
+    left: 90%;
+    top: 45%;
+    border-width: 0.125em;
+    border-style: solid;
+    border-color: transparent;
+    border-bottom-color: var(--text);
+    border-right-color: var(--text);
+    border-radius: 0 0 0.3125em 0;
+    transform: translate(-0%, -0%) rotate(-45deg);
 }
 
-/* ######## Radio Buttons ############## */
-.radio {
-	background: #f6f7fd;
-	padding: 4px;
-	border-radius: 3px;
-	box-shadow: inset 0 0 0 3px rgba(35, 33, 45, 0.3),
-		0 0 0 3px rgba(185, 185, 185, 0.3);
-	position: relative;
-}
-
-.radio input {
-	width: max-content;
-	height: 100%;
-	appearance: none;
-	outline: none;
-	cursor: pointer;
-	border-radius: 2px;
-	padding: 4px 8px;
-	background: #454857;
-	color: #bdbdbdbd;
-	font-size: 0.8em;
-	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-		"Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
-		"Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-	transition: all 100ms linear;
-}
-
-.radio input:checked {
-	background-image: linear-gradient(180deg, #4e70ce, #5197d8);
-	color: #fff;
-	box-shadow: 0 1px 1px #0000002e;
-	text-shadow: 0 1px 0px #79485f7a;
-}
-
-.radio input:before {
-	content: attr(label);
-	display: inline-block;
-	text-align: center;
-	width: 100%;
-}
-
-/* ############ Links and credits ####*/
-
+/* ############# Links and Credits ############## */
 .link-icon-div {
-	position: fixed;
-	left: 90.0%;
-	top: 0.0%;
-	vertical-align: middle;
-	align-content: flex-start;
+    position: fixed;
+    left: 90.0%;
+    top: 0.0%;
+    vertical-align: middle;
+    align-content: flex-start;
+}
+
+.link-icon-div a,
+.link-icon-div a:visited {
+    text-decoration: none;
+    vertical-align: middle;
+    color: var(--text);
+}
+
+.link-icon-div a:last-child {
+    padding-top: 2.3em;
 }
 
 .credits-icon-div {
-	position: fixed;
-	left: 90.5%;
-	top: 95%;
-	font-size: x-small;
+    position: fixed;
+    left: 90.5%;
+    top: 95%;
+    font-size: 0.75em;
+    color: var(--text);
 }
 
 .svg-icon {
-	padding-top: 1em;
-	width: 50px;
-	height: 50px;
-
+    padding-top: 1em;
+    width: 3.125em;
+    height: 3.125em;
+    fill: var(--text);
 }
 
-
-/* ######## Switch ############## */
-@media only screen and (max-width: 1200px) {
-	.round-button {
-		box-sizing: border-box;
-		display: block;
-		width: 2em;
-		/* 80px */
-		height: 2em;
-		left: -2.5%;
-		padding-top: 0.3em;
-		padding-left: 0px;
-		line-height: 0px;
-		border: 6px solid #fff;
-		border-radius: 50%;
-		color: #f5f5f5;
-		text-align: center;
-		text-decoration: none;
-		background-color: #467387;
-		font-size: 1em;
-		font-weight: bold;
-		transition: all 0.3s ease;
-	}
-
-	.container {
-		display: block;
-		position: absolute;
-		left: 2%;
-		top: 22%;
-		transform: translate(-0%, -0%);
-		height: 55%;
-		width: 96%;
-		max-width: 96%;
-		background: #ffff;
-		overflow: hidden;
-		border-radius: 20px;
-		box-shadow: 0 0 20px 8px #d0d0d0;
-	}
-
-	.icon-text {
-		font-size: 0.8em !important;
-		text-align: center;
-	}
-
-	.ipa-text-small {
-		font-size: small;
-	}
-
-	.round-button-mic {
-		box-sizing: border-box;
-		display: block;
-		width: 3.5em;
-		/* 80px */
-		height: 3.5em;
-		padding-top: 0.4em;
-		left: 40%;
-		line-height: 0px;
-		border: 6px solid #fff;
-		border-radius: 50%;
-		color: #f5f5f5;
-		text-align: center;
-		text-decoration: none;
-		background-color: #49d67d;
-		font-size: 20px;
-		font-weight: bold;
-		transition: all 0.3s ease;
-	}
-
-	.mic-button-div {
-		position: fixed;
-		left: 40%;
-		top: 80%
-	}
-
-	.link-icon-div {
-		position: fixed;
-		left: 89.0%;
-		top: 0.0%;
-		vertical-align: middle;
-	}
-
-	.credits-icon-div {
-		position: fixed;
-		left: 78.5%;
-		top: 95%;
-		font-size: x-small;
-	}
-
-	.svg-icon {
-		padding-top: 1em;
-		width: 40px;
-		height: 40px;
-	}
-
-
-	.icon-text-home {
-		font-size: 2.5em !important;
-	}
-
-	.accuracy-text {
-		font-family: "Dank Mono", ui-monospace, monospace;
-		background: linear-gradient(to right,
-				rgb(54, 56, 80),
-				rgb(21, 60, 87));
-		left: -5.0%;
-		background-clip: text;
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		text-align: center;
-		font-size: 0.8em;
-	}
-
+/* ############# Disabled Links ############## */
+a.disabled {
+    pointer-events: none;
+    color: #ccc;
+    background-color: #ccc;
 }
+
+/* ############# IPA Pair ############## */
+#single_word_ipa_pair {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 2em;
+}
+
+.ipa-word-left, .ipa-word-right {
+    flex: 1 1 0;
+    text-align: center;
+    cursor: pointer;
+    padding: 0.5em 1em;
+    border-radius: 0.5em;
+    transition: background 0.2s;
+    color: var(--text);
+}
+
+.ipa-word-left:hover, .ipa-word-right:hover {
+    background: var(--hover-bg);
+}
+

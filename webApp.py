@@ -62,4 +62,7 @@ if __name__ == "__main__":
     language = 'de'
     print(os.system('pwd'))
     webbrowser.open_new('http://127.0.0.1:3000/')
-    app.run(host="0.0.0.0", port=3000)
+    app.config.update(
+        TEMPLATES_AUTO_RELOAD=True
+    )
+    app.run(host="0.0.0.0", port=3000,debug=True)
