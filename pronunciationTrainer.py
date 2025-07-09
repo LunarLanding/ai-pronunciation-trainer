@@ -1,15 +1,16 @@
 
-import torch
-import numpy as np
-import models as mo
-import WordMetrics
-import WordMatching as wm
-import epitran
-import ModelInterfaces as mi
-import AIModels
-import RuleBasedModels
-from string import punctuation
 import time
+from string import punctuation
+
+import epitran
+import numpy as np
+import torch
+
+import ModelInterfaces as mi
+import models as mo
+import RuleBasedModels
+import WordMatching as wm
+import WordMetrics
 
 
 def getTrainer(language: str):
@@ -37,7 +38,7 @@ class PronunciationTrainer:
     current_recorded_audio: torch.Tensor
     current_recorded_transcript: str
     current_recorded_word_locations: list
-    current_recorded_intonations: torch.tensor
+    current_recorded_intonations: torch.Tensor
     current_words_pronunciation_accuracy = []
     categories_thresholds = np.array([80, 60, 59])
 
@@ -58,7 +59,7 @@ class PronunciationTrainer:
 
         return audio_transcript, word_locations_in_samples
 
-    def getWordsRelativeIntonation(self, Audio: torch.tensor, word_locations: list):
+    def getWordsRelativeIntonation(self, Audio: torch.Tensor, word_locations: list):
         intonations = torch.zeros((len(word_locations), 1))
         intonation_fade_samples = 0.3*self.sampling_rate
         print(intonations.shape)
@@ -75,7 +76,7 @@ class PronunciationTrainer:
 
     ##################### ASR Functions ###########################
 
-    def processAudioForGivenText(self, recordedAudio: torch.Tensor = None, real_text=None):
+    def processAudioForGivenText(self, recordedAudio: torch.Tensor, real_text:str):
 
         start = time.time()
         recording_transcript, recording_ipa, word_locations = self.getAudioTranscript(
@@ -104,7 +105,7 @@ class PronunciationTrainer:
 
         return result
 
-    def getAudioTranscript(self, recordedAudio: torch.Tensor = None):
+    def getAudioTranscript(self, recordedAudio: torch.Tensor):
         current_recorded_audio = recordedAudio
 
         current_recorded_audio = self.preprocessAudio(
@@ -119,14 +120,15 @@ class PronunciationTrainer:
 
         return current_recorded_transcript, current_recorded_ipa, current_recorded_word_locations
 
-    def getWordLocationsFromRecordInSeconds(self, word_locations, mapped_words_indices) -> list:
+    def getWordLocationsFromRecordInSeconds(self, word_locations, mapped_words_indices) -> tuple[str,str]:
         start_time = []
         end_time = []
-        for word_idx in range(len(mapped_words_indices)):
-            start_time.append(float(word_locations[mapped_words_indices[word_idx]]
-                                    [0])/self.sampling_rate)
-            end_time.append(float(word_locations[mapped_words_indices[word_idx]]
-                                  [1])/self.sampling_rate)
+        if word_locations:
+            for word_idx in range(len(mapped_words_indices)):
+                start_time.append(float(word_locations[mapped_words_indices[word_idx]]
+                                        [0])/self.sampling_rate)
+                end_time.append(float(word_locations[mapped_words_indices[word_idx]]
+                                    [1])/self.sampling_rate)
         return ' '.join([str(time) for time in start_time]), ' '.join([str(time) for time in end_time])
 
     ##################### END ASR Functions ###########################
@@ -154,10 +156,10 @@ class PronunciationTrainer:
                                                    self.ipa_converter.convertToPhonem(mapped_words[word_idx])))
         return real_and_transcribed_words, real_and_transcribed_words_ipa, mapped_words_indices
 
-    def getPronunciationAccuracy(self, real_and_transcribed_words_ipa) -> float:
+    def getPronunciationAccuracy(self, real_and_transcribed_words_ipa) -> tuple[float,list[float]]:
         total_mismatches = 0.
         number_of_phonemes = 0.
-        current_words_pronunciation_accuracy = []
+        current_words_pronunciation_accuracy : list[float] = []
         for pair in real_and_transcribed_words_ipa:
 
             real_without_punctuation = self.removePunctuation(pair[0]).lower()
@@ -188,9 +190,9 @@ class PronunciationTrainer:
         return categories
 
     def getPronunciationCategoryFromAccuracy(self, accuracy) -> int:
-        return np.argmin(abs(self.categories_thresholds-accuracy))
+        return int(np.argmin(abs(self.categories_thresholds-accuracy)))
 
-    def preprocessAudio(self, audio: torch.tensor) -> torch.tensor:
+    def preprocessAudio(self, audio: torch.Tensor) -> torch.Tensor:
         audio = audio-torch.mean(audio)
         audio = audio/torch.max(torch.abs(audio))
         return audio

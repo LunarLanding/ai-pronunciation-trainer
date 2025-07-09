@@ -1,14 +1,17 @@
+import pickle
+
 import torch
 import torch.nn as nn
-import pickle
+
+from AIModels import NeuralASR
 from ModelInterfaces import IASRModel
-from AIModels import NeuralASR 
+
 
 def getASRModel(language: str,use_whisper:bool=True) -> IASRModel:
 
     if use_whisper:
         from whisper_wrapper import WhisperASRModel
-        return WhisperASRModel()
+        return WhisperASRModel({'de':'german','en':'english','fr':'french'}[language])
     
     if language == 'de':
 
@@ -60,8 +63,7 @@ def getTTSModel(language: str) -> nn.Module:
 
 
 def getTranslationModel(language: str) -> nn.Module:
-    from transformers import AutoTokenizer
-    from transformers import AutoModelForSeq2SeqLM
+    from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
     if language == 'de':
         model = AutoModelForSeq2SeqLM.from_pretrained(
             "Helsinki-NLP/opus-mt-de-en")

@@ -1,12 +1,13 @@
-from flask import Flask, render_template, request
-import webbrowser
-import os
-from flask_cors import CORS
 import json
+import os
+import webbrowser
 
-import lambdaTTS
-import lambdaSpeechToScore
+from flask import Flask, render_template, request
+from flask_cors import CORS
+
 import lambdaGetSample
+import lambdaSpeechToScore
+import lambdaTTS
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -39,7 +40,10 @@ def GetAccuracyFromRecordedAudio():
         event = {'body': json.dumps(request.get_json(force=True))}
         lambda_correct_output = lambdaSpeechToScore.lambda_handler(event, [])
     except Exception as e:
-        print('Error: ', str(e))
+        import traceback
+        print(e)
+        print(traceback.format_exc())
+
         return {
             'statusCode': 200,
             'headers': {

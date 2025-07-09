@@ -1,0 +1,29 @@
+[workspace]
+authors = ["LunarLanding <4441338+LunarLanding@users.noreply.github.com>"]
+channels = ["conda-forge"]
+name = "ai-pronunciation-trainer"
+platforms = ["osx-arm64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+python = ">=3.12,<3.13"
+
+[pypi-dependencies]
+torch = ">=2.7.0, <3"
+soundfile = ">=0.13.1, <0.14"
+omegaconf = ">=2.3.0, <3"
+audioread = ">=3.0.1, <4"
+requests = ">=2.32.3, <3"
+pandas = ">=2.2.3, <3"
+flask = ">=3.1.0, <4"
+flask-cors = ">=5.0.1, <6"
+sqlalchemy = ">=2.0.40, <3"
+sentencepiece = ">=0.2.0, <0.3"
+transformers = ">=4.51.3, <5"
+dtwalign = ">=0.1.1, <0.2"
+epitran = ">=1.26.0, <2"
+eng-to-ipa = ">=0.0.2, <0.0.3"
+pickle-mixin = ">=1.0.2, <2"
+torchaudio = ">=2.7.0, <3"

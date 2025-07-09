@@ -1,9 +1,12 @@
-import WordMetrics
-import numpy as np
-from string import punctuation
-from dtwalign import dtw_from_distance_matrix
 import time
-from typing import List, Tuple
+from string import punctuation
+from typing import List, Literal, Tuple
+
+import numpy as np
+from dtwalign import dtw_from_distance_matrix
+
+import WordMetrics
+
 #from ortools.sat.python import cp_model
 
 offset_blank = 1
@@ -171,7 +174,7 @@ def get_best_mapped_words_dtw(words_estimated: list, words_real: list) -> list:
 
 
 def getWhichLettersWereTranscribedCorrectly(real_word, transcribed_word):
-    is_leter_correct = [None]*len(real_word)    
+    is_leter_correct : list[None | Literal[1,0]] = [None]*len(real_word)    
     for idx, letter in enumerate(real_word):   
         letter = letter.lower()    
         transcribed_word[idx] = transcribed_word[idx].lower() 
