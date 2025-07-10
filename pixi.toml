@@ -9,6 +9,7 @@ version = "0.1.0"
 
 [dependencies]
 python = ">=3.12,<3.13"
+r-rsvg = ">=2.6.1,<3"
 
 [pypi-dependencies]
 torch = ">=2.7.0, <3"

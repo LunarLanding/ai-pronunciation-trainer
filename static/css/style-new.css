@@ -222,15 +222,21 @@ p {
     max-width: 37.5rem;
     min-width: 0;
     height: auto;
-    background: var(--container-bg);
-    color: var(--text);
+    /* background: var(--container-bg);
+    color: var(--text); */
     overflow: hidden;
     border-radius: 1.25rem;
-    box-shadow: var(--shadow);
+    /* box-shadow: var(--shadow); */
     padding: 1vw 2vw;
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+#reference_word, #spoken_word {
+    background: var(--container-bg);
+    color: var(--text);
+    box-shadow: var(--shadow);
 }
 
 .container-small .ipa-text-small {
@@ -487,7 +493,7 @@ a.disabled {
     flex: 1 1 0;
     text-align: center;
     cursor: pointer;
-    padding: 0.5em 1em;
+    padding: 0.5em 0.5em;
     border-radius: 0.5em;
     transition: background 0.2s;
     color: var(--text);

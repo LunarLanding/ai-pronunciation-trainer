@@ -42,7 +42,7 @@ let apiMainPathSTS = '';// 'https://wrg7ayuv7i.execute-api.eu-central-1.amazonaw
 
 
 // Variables to playback accuracy sounds
-let soundsPath = '../static';//'https://stscore-sounds-bucket.s3.eu-central-1.amazonaws.com';
+let soundsPath = '/static/sounds';//'https://stscore-sounds-bucket.s3.eu-central-1.amazonaws.com';
 let soundFileGood = null;
 let soundFileOkay = null;
 let soundFileBad = null;
@@ -102,8 +102,7 @@ const UINotSupported = () => {
 
 const UIRecordingError = () => {
     unblockUI();
-    document.getElementById("main_title").innerHTML = "Recording error, please try again or restart page.";
-    startMediaDevice();
+    document.getElementById("main_title").innerHTML = "Recording error, please restart page.";
 }
 
 
@@ -193,7 +192,7 @@ const getNextSample = async () => {
 
                 document.getElementById("recorded_ipa_script").innerHTML = ""
                 document.getElementById("pronunciation_accuracy").innerHTML = "";
-                document.getElementById("reference_word").innerHTML ="";
+                document.getElementById("reference_word").innerHTML = "";
                 document.getElementById("spoken_word").innerHTML = "";
                 document.getElementById("section_accuracy").innerHTML = "Score: " + currentScore.toString() + " - (" + currentSample.toString() + ")";
                 currentSample += 1;
@@ -208,8 +207,7 @@ const getNextSample = async () => {
 
             })
     }
-    catch (error)
-    {
+    catch (error) {
         UIError(error);
     }
 
@@ -218,33 +216,161 @@ const getNextSample = async () => {
 
 const updateRecordingState = async () => {
     if (isRecording) {
+        isRecording = false;
         stopRecording();
         return
     }
     else {
-        recordSample()
+        isRecording = true;
+        await startRecording()
         return;
     }
 }
 
-const generateWordModal = (word_idx) => {
 
-    document.getElementById("reference_word").innerHTML = wrapWordForPlayingLink(real_transcripts_ipa[word_idx], word_idx, false,  getThemeColor('--text'));
 
-    document.getElementById("spoken_word").innerHTML = wrapWordForPlayingLink(matched_transcripts_ipa[word_idx], word_idx, true, accuracy_colors[parseInt(wordCategories[word_idx])]);
-}
+const startRecording = async () => {
 
-const recordSample = async () => {
+    stream = await navigator.mediaDevices.getUserMedia(mediaStreamConstraints);
+
+    mediaRecorder = new MediaRecorder(stream);
+
+    setupMediaRecorderEvents();
+
+    mediaRecorder.start();
 
     document.getElementById("main_title").innerHTML = "Recording... click again when done speaking";
     document.getElementById("recordIcon").innerHTML = 'pause_presentation';
     blockUI();
     document.getElementById("recordAudio").classList.remove('disabled');
     audioChunks = [];
-    isRecording = true;
-    mediaRecorder.start();
+};
 
+const stopRecording = () => {
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+        mediaRecorder.stop();
+    }
+    mediaRecorder = null;
+
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+    }
+
+    document.getElementById("main_title").innerHTML = "Processing audio...";
+};
+
+const setupMediaRecorderEvents = () => {
+    let currentSamples = 0;
+    mediaRecorder.ondataavailable = event => {
+        currentSamples += event.data.length;
+        audioChunks.push(event.data);
+    };
+
+    mediaRecorder.onstop = async () => {
+
+        document.getElementById("recordIcon").innerHTML = 'mic';
+        blockUI();
+
+
+        audioBlob = new Blob(audioChunks, { type: 'audio/ogg;' });
+
+        let audioUrl = URL.createObjectURL(audioBlob);
+        audioRecorded = new Audio(audioUrl);
+
+        let audioBase64 = await convertBlobToBase64(audioBlob);
+
+        let minimumAllowedLength = 6;
+        if (audioBase64.length < minimumAllowedLength) {
+            setTimeout(UIRecordingError, 50); // Make sure this function finished after get called again
+            return;
+        }
+
+        try {
+            // Get currentText from "original_script" div, in case user has change it
+            let text = document.getElementById("original_script").innerHTML;
+            // Remove html tags
+            text = text.replace(/<[^>]*>?/gm, '');
+            //Remove spaces on the beginning and end
+            text = text.trim();
+            // Remove double spaces
+            text = text.replace(/\s\s+/g, ' ');
+            currentText = [text];
+
+            await fetch(apiMainPathSTS + '/GetAccuracyFromRecordedAudio', {
+                method: "post",
+                body: JSON.stringify({ "title": currentText[0], "base64Audio": audioBase64, "language": AILanguage }),
+                headers: { "X-Api-Key": STScoreAPIKey }
+
+            }).then(res => res.json()).
+                then(data => {
+
+                    if (playAnswerSounds)
+                        playSoundForAnswerAccuracy(parseFloat(data.pronunciation_accuracy))
+
+                    document.getElementById("recorded_ipa_script").innerHTML = "/ " + data.ipa_transcript + " /";
+                    document.getElementById("recordAudio").classList.add('disabled');
+                    document.getElementById("main_title").innerHTML = page_title;
+                    document.getElementById("pronunciation_accuracy").innerHTML = data.pronunciation_accuracy + "%";
+                    document.getElementById("ipa_script").innerHTML = data.real_transcripts_ipa
+
+                    if (!data.is_letter_correct_all_words) {
+
+                    } else {
+                        lettersOfWordAreCorrect = data.is_letter_correct_all_words.split(" ")
+
+
+                        startTime = data.start_time;
+                        endTime = data.end_time;
+
+
+                        real_transcripts_ipa = data.real_transcripts_ipa.split(" ")
+                        matched_transcripts_ipa = data.matched_transcripts_ipa.split(" ")
+                        wordCategories = data.pair_accuracy_category.split(" ")
+                        let currentTextWords = currentText[0].split(" ")
+
+                        coloredWords = "";
+                        for (let word_idx = 0; word_idx < currentTextWords.length; word_idx++) {
+
+                            wordTemp = '';
+                            for (let letter_idx = 0; letter_idx < currentTextWords[word_idx].length; letter_idx++) {
+                                letter_is_correct = lettersOfWordAreCorrect[word_idx][letter_idx] == '1'
+                                if (letter_is_correct)
+                                    color_letter = 'green'
+                                else
+                                    color_letter = 'red'
+
+                                wordTemp += '<font color=' + color_letter + '>' + currentTextWords[word_idx][letter_idx] + "</font>"
+                            }
+                            currentTextWords[word_idx]
+                            coloredWords += " " + wrapWordForIndividualPlayback(wordTemp, word_idx)
+                        }
+
+
+
+                        document.getElementById("original_script").innerHTML = coloredWords
+
+                        currentSoundRecorded = true;
+                    }
+
+                    unblockUI();
+                    document.getElementById("playRecordedAudio").classList.remove('disabled');
+
+                });
+        }
+        catch (error) {
+            UIError(error);
+        }
+    };
+};
+
+const generateWordModal = (word_idx) => {
+
+    document.getElementById("reference_word").innerHTML = wrapWordForPlayingLink(real_transcripts_ipa[word_idx], word_idx, false, getThemeColor('--text'));
+
+    document.getElementById("spoken_word").innerHTML = wrapWordForPlayingLink(matched_transcripts_ipa[word_idx], word_idx, true, accuracy_colors[parseInt(wordCategories[word_idx])]);
 }
+
 
 const changeLanguage = (language, generateNewSample = false) => {
     voices = synth.getVoices();
@@ -288,119 +414,15 @@ const changeLanguage = (language, generateNewSample = false) => {
 //################### Speech-To-Score function ########################
 const mediaStreamConstraints = {
     audio: {
-        channelCount: 1,
-        sampleRate: 48000
-    }
+    echoCancellation: true,
+    noiseSuppression: true,
+    autoGainControl: true,
+    // Add these for better Safari compatibility
+    channelCount: 1,
+    sampleRate: 44100
+  }
 }
 
-
-const startMediaDevice = () => {
-    navigator.mediaDevices.getUserMedia(mediaStreamConstraints).then(_stream => {
-        stream = _stream
-        mediaRecorder = new MediaRecorder(stream);
-
-        let currentSamples = 0
-        mediaRecorder.ondataavailable = event => {
-
-            currentSamples += event.data.length
-            audioChunks.push(event.data);
-        };
-
-        mediaRecorder.onstop = async () => {
-
-
-            document.getElementById("recordIcon").innerHTML = 'mic';
-            blockUI();
-
-
-            audioBlob = new Blob(audioChunks, { type: 'audio/ogg;' });
-
-            let audioUrl = URL.createObjectURL(audioBlob);
-            audioRecorded = new Audio(audioUrl);
-
-            let audioBase64 = await convertBlobToBase64(audioBlob);
-
-            let minimumAllowedLength = 6;
-            if (audioBase64.length < minimumAllowedLength) {
-                setTimeout(UIRecordingError, 50); // Make sure this function finished after get called again
-                return;
-            }
-
-            try {
-                // Get currentText from "original_script" div, in case user has change it
-                let text = document.getElementById("original_script").innerHTML;
-                // Remove html tags
-                text = text.replace(/<[^>]*>?/gm, '');
-                //Remove spaces on the beginning and end
-                text = text.trim();
-                // Remove double spaces
-                text = text.replace(/\s\s+/g, ' ');
-                currentText = [text];
-
-                await fetch(apiMainPathSTS + '/GetAccuracyFromRecordedAudio', {
-                    method: "post",
-                    body: JSON.stringify({ "title": currentText[0], "base64Audio": audioBase64, "language": AILanguage }),
-                    headers: { "X-Api-Key": STScoreAPIKey }
-
-                }).then(res => res.json()).
-                    then(data => {
-
-                        if (playAnswerSounds)
-                            playSoundForAnswerAccuracy(parseFloat(data.pronunciation_accuracy))
-
-                        document.getElementById("recorded_ipa_script").innerHTML = "/ " + data.ipa_transcript + " /";
-                        document.getElementById("recordAudio").classList.add('disabled');
-                        document.getElementById("main_title").innerHTML = page_title;
-                        document.getElementById("pronunciation_accuracy").innerHTML = data.pronunciation_accuracy + "%";
-                        document.getElementById("ipa_script").innerHTML = data.real_transcripts_ipa
-
-                        lettersOfWordAreCorrect = data.is_letter_correct_all_words.split(" ")
-
-
-                        startTime = data.start_time;
-                        endTime = data.end_time;
-
-
-                        real_transcripts_ipa = data.real_transcripts_ipa.split(" ")
-                        matched_transcripts_ipa = data.matched_transcripts_ipa.split(" ")
-                        wordCategories = data.pair_accuracy_category.split(" ")
-                        let currentTextWords = currentText[0].split(" ")
-
-                        coloredWords = "";
-                        for (let word_idx = 0; word_idx < currentTextWords.length; word_idx++) {
-
-                            wordTemp = '';
-                            for (let letter_idx = 0; letter_idx < currentTextWords[word_idx].length; letter_idx++) {
-                                letter_is_correct = lettersOfWordAreCorrect[word_idx][letter_idx] == '1'
-                                if (letter_is_correct)
-                                    color_letter = 'green'
-                                else
-                                    color_letter = 'red'
-
-                                wordTemp += '<font color=' + color_letter + '>' + currentTextWords[word_idx][letter_idx] + "</font>"
-                            }
-                            currentTextWords[word_idx]
-                            coloredWords += " " + wrapWordForIndividualPlayback(wordTemp, word_idx)
-                        }
-
-
-
-                        document.getElementById("original_script").innerHTML = coloredWords
-
-                        currentSoundRecorded = true;
-                        unblockUI();
-                        document.getElementById("playRecordedAudio").classList.remove('disabled');
-
-                    });
-            }
-            catch (error){
-                UIError(error);
-            }
-        };
-
-    });
-};
-startMediaDevice();
 
 // ################### Audio playback ##################
 const playSoundForAnswerAccuracy = async (accuracy) => {
@@ -477,11 +499,6 @@ const playNativeAndRecordedWord = async (word_idx) => {
     isNativeSelectedForPlayback = !isNativeSelectedForPlayback;
 }
 
-const stopRecording = () => {
-    isRecording = false
-    mediaRecorder.stop()
-    document.getElementById("main_title").innerHTML = "Processing audio...";
-}
 
 
 const playCurrentWord = async (word_idx) => {
@@ -582,10 +599,17 @@ const initializeServer = async () => {
                 valid_response = true);
             serverIsInitialized = true;
         }
-        catch
-        {
+        catch {
             number_of_tries += 1;
         }
     }
+}
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/static/service-worker.js').catch(err => {
+            console.error("ServiceWorker registration failed:", err);
+        });
+    });
 }
 
